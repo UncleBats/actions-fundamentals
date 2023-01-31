@@ -1,0 +1,57 @@
+name: staged deployment
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "environment to deploy to"
+        type: environment
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: github.event_name == "workflow_dispatch"
+    steps:
+      - run: echo "build something"
+
+  Test:
+    runs-on: ubuntu-latest
+    if: github.event_name == "workflow_dispatch"
+    environment: test
+    needs: build
+    steps:
+      - run: echo "Test something"
+  
+  Load-test:
+    runs-on: ubuntu-latest
+    if: github.event_name == "workflow_dispatch"
+    environment: load-test
+    needs: build
+    steps:
+      - run: |
+          echo "load test something"
+          sleep 15
+          
+  Production:
+    runs-on: ubuntu-latest
+    if: github.event_name == "workflow_dispatch"
+    environment: 
+      name: production
+      url: https://writabout.net
+    needs: [Test, Load-test]
+    steps:
+        - run: |
+            echo "🚀 Step 1..."
+            sleep 10
+        - run: |
+            echo "🚀 Step 2..."
+            sleep 10
+        - run: |
+            echo "🚀 Step 3..."
+            sleep 10
+        - run: |
+            echo "🚀 Step 4..."
+            sleep 10
+        - run: |
+            echo "🚀 Step 5..."
+            sleep 10
